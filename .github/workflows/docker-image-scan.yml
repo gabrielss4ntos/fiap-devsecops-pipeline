@@ -1,4 +1,4 @@
-name: Trivy Docker Image Scan
+name: Trivy Docker Security Scan
 
 on:
   pull_request:
@@ -8,11 +8,10 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
   security-events: write
 
 jobs:
-  trivy-docker:
+  docker-security:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,10 +21,19 @@ jobs:
         run: docker build -t local-image:latest .
 
       - name: Trivy Docker Image Scan
-        uses: reviewdog/action-trivy@v1
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        env:
+          TRIVY_DEBUG: true
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          trivy_command: image
-          trivy_target: local-image:latest
-          reporter: github-pr-review
-          level: warning
+          image-ref: "local-image:latest"
+          scan-type: "image"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH,MEDIUM,LOW"
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"

@@ -15,6 +15,7 @@ jobs:
       - uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: on-failure
+          show-openssf-scorecard: false
           license-check: false
           vulnerability-check: true
           fail-on-severity: critical

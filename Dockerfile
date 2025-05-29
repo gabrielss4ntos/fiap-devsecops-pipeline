@@ -10,7 +10,7 @@ EXPOSE 22 3306 5432 8080
 COPY . /app
 WORKDIR /app
 
-RUN sudo chmod 777 /app
+RUN chmod 777 /app
 
 # Comando para manter container rodando
 CMD ["sleep", "infinity"]

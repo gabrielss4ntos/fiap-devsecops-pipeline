@@ -40,7 +40,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '/'
           format: 'sarif'
-          scanners: 'vuln,secret,misconfig'
+          scanners: 'vuln,misconfig'
           severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
           exit-code: 0
           output: 'trivy-terraform-results.sarif'

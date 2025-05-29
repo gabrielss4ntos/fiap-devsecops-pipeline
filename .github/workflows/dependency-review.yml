@@ -1,0 +1,15 @@
+name: Dependency Review
+
+on:
+  pull_request:
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: on-failure
+          license-check: false
+          vulnerability-check: true
+          fail-on-severity: critical

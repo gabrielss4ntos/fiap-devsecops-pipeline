@@ -1,0 +1,27 @@
+name: Trivy Terraform Scan
+
+on:
+  pull_request:
+    paths:
+      - '**.tf'
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  trivy-terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy Terraform Scan
+        uses: reviewdog/action-trivy@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          trivy_command: config
+          trivy_target: .
+          reporter: github-pr-review
+          level: info

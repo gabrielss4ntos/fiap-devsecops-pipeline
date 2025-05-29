@@ -10,18 +10,41 @@ permissions:
   pull-requests: write
   security-events: write
 
+# jobs:
+#   trivy-terraform:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Trivy Terraform Scan
+#         uses: reviewdog/action-trivy@v1
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           trivy_command: config
+#           trivy_target: .
+#           reporter: github-pr-review
+#           level: info
+
 jobs:
-  trivy-terraform:
+  terraform_security_scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Trivy Terraform Scan
-        uses: reviewdog/action-trivy@v1
+
+      - name: Scan Terraform
+        uses: aquasecurity/trivy-action@0.30.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          trivy_command: config
-          trivy_target: .
-          reporter: github-pr-review
-          level: info
+          scan-type: 'fs'
+          format: 'sarif'
+          scanners: 'vuln,secret,misconfig'
+          severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+          exit-code: 0
+          output: 'trivy-terraform-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+            sarif_file: 'trivy-terraform-results.sarif'

@@ -28,9 +28,9 @@ jobs:
         with:
           image-ref: "local-image:latest"
           format: "sarif"
+          output: "trivy-results.sarif"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
-          output: "trivy-results.sarif"
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3

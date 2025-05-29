@@ -1,31 +1,35 @@
-name: Trivy Docker Image Scan
+# Dockerfile intencionalmente vulnerável para testes do Trivy
+FROM ubuntu:latest
 
-on:
-  pull_request:
-    paths:
-      - '**/Dockerfile*'
-      - '**/*.dockerfile'
+# ❌ Rodando como root (sem USER)
+# ❌ Usando tag 'latest' (não específica)
 
-permissions:
-  contents: read
-  pull-requests: write
-  security-events: write
+# ❌ Instalando pacotes sem atualizar cache
+RUN apt-get install -y curl wget
 
-jobs:
-  trivy-docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+# ❌ Deixando senhas hardcoded
+ENV DATABASE_PASSWORD=admin123
+ENV API_KEY=sk-1234567890abcdef
 
-      - name: Build Docker Image
-        run: docker build -t local-image:latest .
+# ❌ Expondo portas desnecessárias
+EXPOSE 22 3306 5432 6379
 
-      - name: Trivy Docker Image Scan
-        uses: reviewdog/action-trivy@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          trivy_command: image
-          trivy_target: local-image:latest
-          reporter: github-pr-review
-          level: warning
+# ❌ Copiando tudo sem .dockerignore
+COPY . /app
+
+# ❌ Permissões muito abertas
+RUN chmod 777 /app
+
+# ❌ Instalando pacotes vulneráveis
+RUN apt-get install -y openssl=1.1.1-1ubuntu2.1~18.04.1
+
+# ❌ Sem HEALTHCHECK
+# ❌ Sem limpeza de cache apt
+# ❌ Múltiplas camadas desnecessárias
+
+RUN mkdir /tmp/sensitive
+RUN echo "secret-data" > /tmp/sensitive/config.txt
+RUN chmod 644 /tmp/sensitive/config.txt
+
+# ❌ Comando inseguro
+CMD ["sh", "-c", "while true; do sleep 30; done"]

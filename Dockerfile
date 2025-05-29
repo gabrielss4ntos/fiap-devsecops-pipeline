@@ -12,5 +12,7 @@ WORKDIR /app
 
 RUN chmod 777 /app
 
+USER root
+
 # Comando para manter container rodando
 CMD ["sleep", "infinity"]
